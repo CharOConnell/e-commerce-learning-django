@@ -12,9 +12,26 @@ def all_products(request):
     products = Product.objects.all()
     query = None
     categories = None
+    sort = None
+    direction = None
     # just set it to None so if there's nothing there it won't crap out
 
     if request.GET:
+        if 'sort' in request.GET:
+            if 'direction' in request.GET:
+                sortkey = request.GET['sort']
+                sort = sortkey
+                if sortkey == 'name':
+                    sortkey = 'lower_name'
+                    products = products.annotate(lower_name=Lower('name'))
+
+                if 'direction' in request.GET:
+                    direction = request.GET['direction']
+                    if direction == 'desc':
+                        sortkey = f'-{sortkey}'
+
+                products = products.order_by(sortkey)
+
         # if it exists, we need to show only the filtered products
         if 'category' in request.GET:
             # if it exists in search
@@ -42,10 +59,13 @@ def all_products(request):
             products = products.filter(queries)
             # passed to the filter method to filter products
 
+    current_sorting = f'{sort}_{direction}'
+
     context = {
         'products': products,
         'search_term': query,
         'current_categories': categories,
+        'current_sorting': current_sorting,
     }
     return render(request, 'products/products.html', context)
     # context as we'll need to send stuff back to the template
