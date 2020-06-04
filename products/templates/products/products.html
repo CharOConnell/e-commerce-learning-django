@@ -28,13 +28,13 @@
                             <div class="card h-100 border-0">
                                 <!-- image -->
                                 {% if product.image %}
-                                <a href="">
-                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top img-fluid">
-                                </a>
+                                    <a href="{% url 'product_detail' product.id %}">
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top img-fluid">
+                                    </a>
                                 {% else %}
-                                <a href="">
-                                    <img src="{{ MEDIA_URL }}noimage.png" alt="{{ product.name }}" class="card-img-top img-fluid">
-                                </a>
+                                    <a href="{% url 'product_detail' product.id %}">
+                                        <img src="{{ MEDIA_URL }}noimage.png" alt="{{ product.name }}" class="card-img-top img-fluid">
+                                    </a>
                                 {% endif %}
                                 <!-- product name -->
                                 <div class="card-body pb-0">
