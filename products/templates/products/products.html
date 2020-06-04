@@ -118,5 +118,50 @@
             </div>
         </div>
     </div>
+    <div class="btt-button shadow-sa rounded-0 border border-black">
+        <a class="btt-link d-flex h-100">
+            <i class="fas fa-arrow-up text-black mx-auto my-auto"></i>
+        </a>
+    </div>
 
+{% endblock %}
+
+{% block postloadjs %}
+<!-- add to the block we set up in the base.html -->
+    {{ block.super }} <!-- append to it, don't overwrite -->
+    <script type="text/javascript">
+        $('.btt-link').click(function(e) {
+            window.scrollTo(0,0);
+        })
+    </script>
+    <script type="text/javascript">
+        $('#sort-selector').change(function() {
+            // capture the change event
+            var selector = $(this);
+            // collect the selector
+            var currentUrl = new URL(window.location);
+            // takes the current URL - will be able to change the sorting parameters
+
+            var selectedVal = selector.val();
+            // collect the selected value from the selector box
+            if (selectedVal != "reset") {
+                // we nicely set this up so it's sort_direction
+                var sort = selectedVal.split("_")[0];
+                var direction = selectedVal.split("_")[1];
+
+                // append the search parameters to the url name
+                currentUrl.searchParams.set("sort", sort);
+                currentUrl.searchParams.set("direction", direction);
+
+                // replace the url with the one to search our selection
+                window.location.replace(currentUrl);
+            } else {
+                // reset all our values - should send us to normal products
+                currentUrl.searchParams.delete("sort");
+                currentUrl.searchParams.delete("direction");
+
+                window.location.replace(currentUrl);
+            }
+        })
+    </script>
 {% endblock %}
