@@ -20,6 +20,7 @@ class Category(models.Model):
         # model method to make it easy to return the name
         return self.friendly_name
 
+
 class Product(models.Model):
     category = models.ForeignKey('Category', null=True, blank=True, on_delete=models.SET_NULL)
     # takes in the foreign key from category, null in database, blank in forms, and if deleted set to null rather than deleting
@@ -27,6 +28,7 @@ class Product(models.Model):
     sku = models.CharField(max_length=254, null=True, blank=True)
     name = models.CharField(max_length=254)
     description = models.TextField()
+    has_sizes = models.BooleanField(default=False, null=True, blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     rating = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
     image_url = models.URLField(max_length=1024, null=True, blank=True)
