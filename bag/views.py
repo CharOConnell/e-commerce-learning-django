@@ -26,5 +26,4 @@ def add_to_bag(request, item_id):
 
     request.session['bag'] = bag
     # overwrite the data if it's there
-    print(request.session['bag'])
     return redirect(redirect_url)
