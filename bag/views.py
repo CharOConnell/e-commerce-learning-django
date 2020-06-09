@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse, HttpResponse
 
 
 def view_bag(request):
@@ -50,3 +50,77 @@ def add_to_bag(request, item_id):
     request.session['bag'] = bag
     # overwrite the data if it's there
     return redirect(redirect_url)
+
+
+def adjust_bag(request, item_id):
+    """ Adjust the quantity of the specified product to the shopping bag """
+    quantity = int(request.POST.get('quantity'))
+    # it will come out of the form as a string so change it
+
+    size = None
+    if 'product_size' in request.POST:
+        size = request.POST['product_size']
+        # if it exists, set it equal to it
+
+    # we want to add to the browser session,
+    # so it will only go after shutting browser
+    bag = request.session.get('bag', {})
+    # see if it's there, if not, create an empty dictionary
+
+    if size:
+        if quantity > 0:
+            bag[item_id]['items_by_size'][size] = quantity
+            # change that size item by the reduction/gain
+        else:
+            del bag[item_id]['items_by_size'][size]
+            # quantity = 0 so delete
+            if not bag[item_id]['items_by_size']:
+                # if that makes that entire item dictionary empty,
+                # let's delete that too
+                bag.pop(item_id)
+    else:
+        # if no size we run this logic
+        if quantity > 0:
+            bag[item_id] = quantity
+        else:
+            bag.pop(item_id)
+            # built in function to delete
+
+    request.session['bag'] = bag
+    # overwrite the data if it's there
+    return redirect(reverse('view_bag'))
+
+
+def remove_from_bag(request, item_id):
+    """ Remove the item from the shopping bag """
+
+    try:
+        size = None
+        if 'product_size' in request.POST:
+            size = request.POST['product_size']
+            # if it exists, set it equal to it
+
+        # we want to add to the browser session,
+        # so it will only go after shutting browser
+        bag = request.session.get('bag', {})
+        # see if it's there, if not, create an empty dictionary
+
+        if size:
+            # if the size exists, we only want to delete that
+            # size of that product
+            del bag[item_id]['items_by_size'][size]
+            if not bag[item_id]['items_by_size']:
+                # if that makes that entire item dictionary empty,
+                # let's delete that too
+                bag.pop(item_id)
+        else:
+            # if no size we run this logic
+            bag.pop(item_id)
+            # built in function to delete
+
+        request.session['bag'] = bag
+        # overwrite the data if it's there
+        return HttpResponse(status=200)
+        # item was successfully removed
+    except Exception as e:
+        return HttpResponse(status=500)
