@@ -6,10 +6,10 @@
     https://stripe.com/docs/stripe-js
 */
 
-var stripe_public_key = $('#id_stripe_public_key').text().slice(1, -1);
+var stripePublicKey = $('#id_stripe_public_key').text().slice(1, -1);
 // remove the apostrophes from either end
-var client_secret = $('#id_client_secret').text().slice(1, -1);
-var stripe = Stripe(stripe_public_key);
+var clientSecret = $('#id_client_secret').text().slice(1, -1);
+var stripe = Stripe(stripePublicKey);
 var elements = stripe.elements();
 
 // Custom styling can be passed to options when creating an Element.
@@ -33,3 +33,54 @@ var style = {
 // instance of stripe elements
 var card = elements.create('card', {style: style});
 card.mount('#card-element');
+
+
+// Handle realtime validation errors on the card element
+card.addEventListener('change', function(event) {
+    var errorDiv = document.getElementById('card-errors');
+    if (event.error) {
+        var html = `
+            <span class="icon" role="alert">
+                <i class="fas fa-times"></i>
+            </span>
+            <span>${event.error.message}</span>`
+        ;
+        $(errorDiv).html(html);
+    } else {
+        errorDiv.textContent = '';
+    }
+});
+
+// Handle form submit
+var form = document.getElementById('payment-form');
+
+form.addEventListener('submit', function(ev) {
+    ev.preventDefault();
+    // prevent default action of post and send to stripe
+    card.update({'disabled': true});
+    $('#submit-button').attr('disabled', true);
+    // disable the submit button and update to prevent multiple submissions
+    stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+        card: card,
+        }
+    }).then(function(result) {
+        if (result.error) {
+            var errorDiv = document.getElementById('card-errors');
+            var html = `
+                <span class="icon" role="alert">
+                    <i class="fas fa-times"></i>
+                </span>
+                <span>${result.error.message}</span>`;
+            $(errorDiv).html(html);
+            // reenable the update in order to fix it
+            card.update({'disabled': false});
+            $('#submit-button').attr('disabled', false);
+        } else {
+            // The payment has been processed!
+            if (result.paymentIntent.status === 'succeeded') {
+                form.submit();
+            }
+        }
+    });
+});
