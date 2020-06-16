@@ -45,9 +45,10 @@ class Order(models.Model):
         """
         # use the aggregate function
         self.order_total = self.lineitems.aggregate(Sum('lineitem_total'))[
-            'lineitem_total__sum']
+            'lineitem_total__sum'] or 0
         # add the new the item of "lineitem_total__sum" and input
         # the sum of all lines on this order
+        # keeps 0 instead of none so it doesn't crap out
         if self.order_total < settings.FREE_DELIVERY_THRESHOLD:
             self.delivery_cost = self.order_total * \
                 settings.STANDARD_DELIVERY_PERCENTAGE / 100
@@ -92,7 +93,7 @@ class OrderLineItem(models.Model):
         Override the original save method to set the order number
         if it hasn't been set already.
         """
-        self.lineitem_total = self.product_price * self.quantity
+        self.lineitem_total = self.product.price * self.quantity
         # product the quantity * product price for each item
         super().save(*args, **kwargs)
 
