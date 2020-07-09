@@ -18,6 +18,6 @@ class ProductForm(forms.ModelForm):
 
         self.fields['category'].choices = friendly_names
         # form will use the friendly names on the form
-        for field_name, field in self.felds.items():
+        for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'border-black rounded-0'
             # style the same as the rest of the site

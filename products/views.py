@@ -4,6 +4,7 @@ from django.db.models import Q
 # to generate a search query
 from django.db.models.functions import Lower
 from .models import Product, Category
+from .forms import ProductForm
 
 
 def all_products(request):
@@ -82,3 +83,15 @@ def product_detail(request, product_id):
     }
     return render(request, 'products/product_detail.html', context)
     # context as we'll need to send stuff back to the template
+
+
+def add_product(request):
+    """ Add a product to the store """
+    form = ProductForm()
+    # render an empty product in our form
+    template = 'products/add_product.html'
+    context = {
+        'form': form,
+    }
+
+    return render(request, template, context)
