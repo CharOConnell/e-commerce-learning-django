@@ -178,6 +178,13 @@ FREE_DELIVERY_THRESHOLD = 50
 STANDARD_DELIVERY_PERCENTAGE = 10
 
 if 'USE_AWS' in os.environ:
+    # Cache control
+    AWS_S3_OBJECT_PARAMETERS = {
+        'Expires': 'Thu, 31 Dec 2099 20:00:00 GMT',
+        'CacheControl': 'max-ace=94608000',
+    }
+    # keep them for a long time as they won't change
+
     # Bucket Config
     AWS_STORAGE_BUCKET_NAME = 'boutique-ado-learning-site'
     AWS_S3_REGION_NAME = 'eu-west-2'
